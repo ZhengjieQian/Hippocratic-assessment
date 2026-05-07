@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import yaml
 import openai
 
 """
@@ -16,202 +17,41 @@ Before submitting the assignment, describe here in a few sentences what you woul
      collaborative, interactive bedtime tool with true human-in-the-loop design.
 """
 
-# ─────────────────────────────────────────────────────────────────────────────
-# CULTURAL TEMPLATES
-# Each culture provides: reference tales, a 4-stage story arc, typical elements,
-# and a language/style guide. These are injected into every agent prompt so the
-# story feels authentically rooted in its cultural tradition.
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
+# CULTURAL TEMPLATES  (loaded from cultures.yaml)
+# Separating data from code makes it easy to add or edit cultures without
+# touching any Python logic. Each culture provides: reference tales, a 4-stage
+# story arc, typical elements, and a language/style guide.
+# -----------------------------------------------------------------------------
 
-CULTURAL_TEMPLATES = {
-    "CN": {
-        "name": "Chinese (中国)",
-        "reference_tales": ["Journey to the West", "Hua Mulan"],
-        "story_arc": {
-            "起 (Qi – Beginning)": (
-                "Introduce a child protagonist in a harmonious setting — a bamboo grove, "
-                "a moonlit village, a family courtyard. A small disruption appears: a lost "
-                "creature, a mysterious glowing object, or an elder's quiet request."
-            ),
-            "承 (Cheng – Development)": (
-                "The child explores or helps, encountering one or two wondrous creatures or "
-                "spirits. Obstacles arise from impatience or pride — qualities the child must "
-                "learn to temper."
-            ),
-            "转 (Zhuan – Turn)": (
-                "An unexpected reversal: the creature the child helped reveals a hidden gift, "
-                "or a simple act of kindness ripples in a surprising and magical way."
-            ),
-            "合 (He – Resolution)": (
-                "Harmony is restored. The child gains wisdom rather than treasure. "
-                "End with one short, proverb-like sentence of moral closure."
-            ),
-        },
-        "typical_elements": {
-            "settings": ["moonlit rice paddy", "misty mountain path", "jade pavilion", "ancient plum tree", "bamboo grove"],
-            "character_types": ["wise grandparent", "mischievous fox spirit", "jade rabbit", "small dragon", "celestial weaver"],
-            "moral_themes": ["filial piety", "patience rewarded", "harmony with nature", "humility over pride", "kindness to animals"],
-        },
-        "language_style": (
-            "Use gentle, lyrical prose with nature imagery — moonlight, mist, blossom. "
-            "Sentences are measured, not too long. Weave in one proverb-like phrase. "
-            "Tone is warm, quiet, and slightly formal — like a grandparent telling a story."
-        ),
-    },
-    "WE": {
-        "name": "Western (西方)",
-        "reference_tales": ["Cinderella", "Jack and the Beanstalk"],
-        "story_arc": {
-            "Ordinary World": (
-                "A child lives in a comfortable but imperfect situation — overlooked, "
-                "timid, or wishing for something more."
-            ),
-            "Call to Adventure": (
-                "A magical event — an enchanted object, a talking animal, a fairy "
-                "godmother — invites the child toward a quest."
-            ),
-            "Trials": (
-                "The child faces 2 escalating challenges that require cleverness or "
-                "inner courage rather than brute strength."
-            ),
-            "Resolution": (
-                "The child succeeds through their own virtue. They return home changed — "
-                "braver, kinder, or wiser. Emotional closure, not just plot closure."
-            ),
-        },
-        "typical_elements": {
-            "settings": ["enchanted forest", "village marketplace", "crumbling castle", "cozy cottage", "silver cloud kingdom"],
-            "character_types": ["fairy godmother", "talking animal companion", "kind-hearted witch", "bumbling giant", "lost prince or princess"],
-            "moral_themes": ["courage over fear", "kindness rewarded", "inner beauty matters", "cleverness beats brute force", "home is where the heart is"],
-        },
-        "language_style": (
-            "Warm, rhythmic storytelling voice. Adapt classic fairy-tale openings freshly "
-            "('Long ago in a kingdom not unlike our own...'). Short declarative sentences "
-            "for action; longer flowing ones for wonder. End with emotional warmth."
-        ),
-    },
-    "JP": {
-        "name": "Japanese (日本)",
-        "reference_tales": ["Momotaro (Peach Boy)", "Tanabata"],
-        "story_arc": {
-            "間 (Ma – Stillness)": (
-                "Open with a quiet, sensory scene. A child notices something others "
-                "overlook — a tiny creature, a glowing stone, a gap in an old shrine gate."
-            ),
-            "縁 (En – Connection)": (
-                "An unlikely bond forms slowly and carefully. The creature has a need; "
-                "the child chooses to help despite personal risk."
-            ),
-            "頑張り (Gambari – Perseverance)": (
-                "The child faces inner doubt and one external obstacle. They persist "
-                "through gentle determination rather than power."
-            ),
-            "物の哀れ (Mono no Aware – Bittersweet Resolution)": (
-                "The goal is achieved, but something is gently released — the creature "
-                "must leave, seasons change. The child holds both joy and quiet sadness."
-            ),
-        },
-        "typical_elements": {
-            "settings": ["shrine steps at dusk", "cherry blossom lane", "quiet fishing village", "bamboo forest in rain", "paper lanterns on a river"],
-            "character_types": ["tanuki (raccoon dog)", "kitsune (fox)", "tengu (mountain spirit)", "kodama (tree spirit)", "gentle sea turtle"],
-            "moral_themes": ["respect for nature", "perseverance", "transience of beauty", "gratitude", "bonds across difference"],
-        },
-        "language_style": (
-            "Sparse, contemplative prose. Short sentences with white space in meaning. "
-            "Rich sensory detail — the sound of rain, the smell of cedar, cool stone underfoot. "
-            "Avoid over-explanation. One or two Japanese words may appear with gentle context. "
-            "Tone: quiet, wonder-filled, and slightly melancholic."
-        ),
-    },
-    "AR": {
-        "name": "Arabian (阿拉伯)",
-        "reference_tales": ["One Thousand and One Nights", "Ali Baba"],
-        "story_arc": {
-            "Frame / Blessing": (
-                "Open with warmth and wonder ('In a city of starlight and spices...'). "
-                "Introduce a clever, warm-hearted child from a humble but loving household."
-            ),
-            "The Quest or Riddle": (
-                "A djinn, wise merchant, or elder poses a riddle or task. "
-                "The child must show wisdom, generosity, or honesty — not just cleverness."
-            ),
-            "Temptation": (
-                "An easy but dishonest shortcut is offered. The child refuses. "
-                "This refusal is the story's moral pivot."
-            ),
-            "Barakah (Blessing)": (
-                "Because of their virtue, the child receives unexpected abundance. "
-                "They share it generously. The story ends with communal warmth."
-            ),
-        },
-        "typical_elements": {
-            "settings": ["desert oasis under stars", "bustling souk", "tiled courtyard with fountain", "hidden cave behind a waterfall", "starlit rooftop"],
-            "character_types": ["friendly djinn", "wise merchant", "mischievous jinn child", "generous baker", "old storyteller grandmother"],
-            "moral_themes": ["generosity over greed", "honesty rewarded", "cleverness with heart", "community and sharing", "trust in goodness"],
-        },
-        "language_style": (
-            "Lush, vivid, sensory-rich prose — 'the air smelled of cardamom and night-blooming jasmine'. "
-            "Use the rhythm of oral storytelling: repetition for emphasis, lists of three. "
-            "Every character has warmth and humanity. Light formal register, "
-            "as if an elder narrates by firelight."
-        ),
-    },
-    "AF": {
-        "name": "African (非洲)",
-        "reference_tales": ["Anansi the Spider (West African)", "The Hare and the Lion (Swahili)"],
-        "story_arc": {
-            "Community": (
-                "Open in a vibrant village or savanna scene. The child is part of a "
-                "community — their problem or gift is woven into the group's life."
-            ),
-            "Trickster Encounter": (
-                "A clever animal — Anansi the spider, a hare, a chameleon — appears. "
-                "It either needs help or offers a lesson disguised as mischief."
-            ),
-            "Ubuntu Test": (
-                "The child faces a choice: act alone for personal gain, or act together "
-                "for shared meaning. Ubuntu — 'I am because we are' — is the deciding force."
-            ),
-            "Celebration": (
-                "Resolution is communal. The village celebrates, animals join in, "
-                "and a proverb closes the story with collective joy."
-            ),
-        },
-        "typical_elements": {
-            "settings": ["acacia tree at sunset", "river crossing at dawn", "village fire circle", "savanna under stars", "baobab tree hollow"],
-            "character_types": ["Anansi the spider", "wise tortoise", "boastful lion", "clever hare", "village elder grandmother"],
-            "moral_themes": ["ubuntu (I am because we are)", "trickster wisdom", "sharing over hoarding", "elders' wisdom", "joy in community"],
-        },
-        "language_style": (
-            "Rhythmic, musical prose — short punchy sentences alternate with longer flowing ones. "
-            "Use call-and-response echoes. Vivid animal sounds and movement. "
-            "Warmth, humor, and energy throughout. End with a proverb-style phrase. "
-            "Tone: joyful, communal, and alive."
-        ),
-    },
-}
+def _load_cultural_templates() -> dict:
+    yaml_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cultures.yaml")
+    with open(yaml_path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+CULTURAL_TEMPLATES = _load_cultural_templates()
+
+
+# -----------------------------------------------------------------------------
 # LAYER 0: Core model call (preserved from skeleton — model must stay gpt-3.5-turbo)
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 def call_model(prompt: str, max_tokens=3000, temperature=0.1) -> str:
-    openai.api_key = os.getenv("OPENAI_API_KEY")  # please use your own openai api key here.
-    resp = openai.ChatCompletion.create(
+    client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))  # please use your own openai api key here.
+    resp = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": prompt}],
-        stream=False,
         max_tokens=max_tokens,
         temperature=temperature,
     )
-    return resp.choices[0].message["content"]  # type: ignore
+    return resp.choices[0].message.content  # type: ignore
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # LAYER 1: UserInput Agent
 # Collects: culture, age range, bedtime state, protagonist, theme
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 def select_culture() -> str:
     options = [
@@ -294,15 +134,15 @@ def collect_theme() -> str:
 
 
 def confirm_request(culture_name, age_range, bedtime_state, name, gender, theme) -> bool:
-    print("\n" + "─" * 48)
+    print("\n" + "-" * 48)
     print("  Story settings")
-    print("─" * 48)
+    print("-" * 48)
     print(f"  Culture:       {culture_name}")
     print(f"  Age range:     {age_range} years old")
     print(f"  Child's mood:  {bedtime_state}")
     print(f"  Protagonist:   {name} ({gender})")
     print(f"  Theme:         {theme}")
-    print("─" * 48)
+    print("-" * 48)
     while True:
         answer = input("Proceed with these settings? (y/n): ").strip().lower()
         if answer == "y":
@@ -333,11 +173,11 @@ def collect_user_input() -> dict:
         print("\nLet's start over.\n")
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # LAYER 2: Outline Agent  (human-in-the-loop)
 # Generates a 5-point story outline, shows it to the user, and allows them to
 # approve, request edits, or regenerate before any full story is written.
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 def build_outline_prompt(template: dict, request: dict) -> str:
     arc_stages = "\n".join(
@@ -401,11 +241,11 @@ def get_approved_outline(template: dict, request: dict) -> str:
     """Generate outline, show to user, loop until approved."""
     outline = generate_outline(template, request)
     while True:
-        print("\n" + "═" * 48)
+        print("\n" + "=" * 48)
         print("  STORY OUTLINE  (your preview before the full story)")
-        print("═" * 48)
+        print("=" * 48)
         print(outline)
-        print("═" * 48)
+        print("=" * 48)
         print("\n  y — looks good, write the full story")
         print("  e — I want to suggest changes")
         print("  r — generate a different outline")
@@ -426,11 +266,11 @@ def get_approved_outline(template: dict, request: dict) -> str:
                 outline = refine_outline_with_feedback(outline, feedback, template, request)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # LAYER 3: Storyteller Agent
 # Expands the approved outline into a full story, injecting the cultural
 # template, age guidance, pacing, and mandatory craft requirements.
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 def build_storyteller_prompt(template: dict, request: dict, outline: str) -> str:
     arc_text = "\n".join(
@@ -505,11 +345,11 @@ def generate_story(template: dict, request: dict, outline: str) -> str:
     return call_model(prompt, max_tokens=900, temperature=0.8)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # LAYER 4: Judge Agent
 # Uses chain-of-thought (Step 1: analyze weakest dimension; Step 2: score JSON)
 # to improve scoring reliability on gpt-3.5-turbo.
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 def build_judge_prompt(story_text: str, culture_name: str, age_range: str) -> str:
     return f"""You are a rigorous children's literature quality judge evaluating a bedtime story for ages {age_range}.
@@ -590,11 +430,11 @@ def evaluate_story(story_text: str, culture_name: str, age_range: str) -> dict:
     return parse_judge_response(response)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # LAYER 5: Refinement Agent
 # Receives the judge's dimension-level scores and suggestions and rewrites
 # only the aspects that fell below threshold, preserving what worked.
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 def build_refinement_prompt(original_story: str, judge_result: dict, template: dict, request: dict) -> str:
     scores = judge_result.get("scores", {})
@@ -640,10 +480,10 @@ def refine_story(story_text: str, judge_result: dict, template: dict, request: d
     return call_model(prompt, max_tokens=900, temperature=0.7)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # LAYER 6: Pipeline Orchestrator
 # Storyteller → Judge → (Refinement → Judge) × max_rounds
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 def run_story_pipeline(template: dict, request: dict, outline: str, max_refinement_rounds: int = 2):
     print("\nWriting story draft...", end=" ", flush=True)
@@ -667,18 +507,18 @@ def run_story_pipeline(template: dict, request: dict, outline: str, max_refineme
     return story, judge, rounds
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # LAYER 7: Output Formatting
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 def _score_bar(score: int) -> str:
     if score <= 4:
-        return "░░░░░"
+        return "[....]"
     if score <= 6:
-        return "███░░"
+        return "[##..]"
     if score <= 8:
-        return "████░"
-    return "█████"
+        return "[###.]"
+    return "[####]"
 
 
 def format_quality_report(judge_result: dict, rounds_used: int) -> str:
@@ -695,15 +535,15 @@ def format_quality_report(judge_result: dict, rounds_used: int) -> str:
 
     lines = [
         "",
-        "─" * 48,
+        "-" * 48,
         "  QUALITY REPORT  (LLM Judge)",
-        "─" * 48,
+        "-" * 48,
     ]
     for key, label in labels.items():
         s = scores.get(key, 0)
         lines.append(f"  {label}  {_score_bar(s)}  {s}/10")
     lines += [
-        "─" * 48,
+        "-" * 48,
         f"  Overall score:  {avg:.1f}/10  ({'passed' if passed else 'below threshold — refined'})",
         f"  Refinement rounds used: {rounds_used}",
     ]
@@ -713,21 +553,21 @@ def format_quality_report(judge_result: dict, rounds_used: int) -> str:
         lines.append(f"\n  Judge analysis:\n  {analysis}")
     if overall:
         lines.append(f"\n  Summary:\n  {overall}")
-    lines.append("─" * 48)
+    lines.append("-" * 48)
     return "\n".join(lines)
 
 
 def display_final_output(story: str, quality_report: str) -> None:
-    print("\n" + "═" * 48)
+    print("\n" + "=" * 48)
     print("  YOUR BEDTIME STORY")
-    print("═" * 48 + "\n")
+    print("=" * 48 + "\n")
     print(story)
     print(quality_report)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # ENTRY POINT
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 example_requests = "A story about a girl named Alice and her best friend Bob, who happens to be a cat."
 
@@ -739,10 +579,10 @@ def main():
         print("  PowerShell:  $env:OPENAI_API_KEY='your-key-here'")
         return
 
-    print("\n" + "═" * 48)
+    print("\n" + "=" * 48)
     print("  BEDTIME STORY GENERATOR")
     print("  Multi-agent AI storytelling system")
-    print("═" * 48)
+    print("=" * 48)
 
     while True:
         request = collect_user_input()

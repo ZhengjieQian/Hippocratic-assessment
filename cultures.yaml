@@ -1,0 +1,214 @@
+CN:
+  name: "Chinese (中国)"
+  reference_tales:
+    - "Journey to the West"
+    - "Hua Mulan"
+  story_arc:
+    "起 (Qi – Beginning)": >-
+      Introduce a child protagonist in a harmonious setting — a bamboo grove,
+      a moonlit village, a family courtyard. A small disruption appears: a lost
+      creature, a mysterious glowing object, or an elder's quiet request.
+    "承 (Cheng – Development)": >-
+      The child explores or helps, encountering one or two wondrous creatures or
+      spirits. Obstacles arise from impatience or pride — qualities the child must
+      learn to temper.
+    "转 (Zhuan – Turn)": >-
+      An unexpected reversal: the creature the child helped reveals a hidden gift,
+      or a simple act of kindness ripples in a surprising and magical way.
+    "合 (He – Resolution)": >-
+      Harmony is restored. The child gains wisdom rather than treasure.
+      End with one short, proverb-like sentence of moral closure.
+  typical_elements:
+    settings:
+      - moonlit rice paddy
+      - misty mountain path
+      - jade pavilion
+      - ancient plum tree
+      - bamboo grove
+    character_types:
+      - wise grandparent
+      - mischievous fox spirit
+      - jade rabbit
+      - small dragon
+      - celestial weaver
+    moral_themes:
+      - filial piety
+      - patience rewarded
+      - harmony with nature
+      - humility over pride
+      - kindness to animals
+  language_style: >-
+    Use gentle, lyrical prose with nature imagery — moonlight, mist, blossom.
+    Sentences are measured, not too long. Weave in one proverb-like phrase.
+    Tone is warm, quiet, and slightly formal — like a grandparent telling a story.
+
+WE:
+  name: "Western (西方)"
+  reference_tales:
+    - "Cinderella"
+    - "Jack and the Beanstalk"
+  story_arc:
+    "Ordinary World": >-
+      A child lives in a comfortable but imperfect situation — overlooked,
+      timid, or wishing for something more.
+    "Call to Adventure": >-
+      A magical event — an enchanted object, a talking animal, a fairy
+      godmother — invites the child toward a quest.
+    "Trials": >-
+      The child faces 2 escalating challenges that require cleverness or
+      inner courage rather than brute strength.
+    "Resolution": >-
+      The child succeeds through their own virtue. They return home changed —
+      braver, kinder, or wiser. Emotional closure, not just plot closure.
+  typical_elements:
+    settings:
+      - enchanted forest
+      - village marketplace
+      - crumbling castle
+      - cozy cottage
+      - silver cloud kingdom
+    character_types:
+      - fairy godmother
+      - talking animal companion
+      - kind-hearted witch
+      - bumbling giant
+      - lost prince or princess
+    moral_themes:
+      - courage over fear
+      - kindness rewarded
+      - inner beauty matters
+      - cleverness beats brute force
+      - home is where the heart is
+  language_style: >-
+    Warm, rhythmic storytelling voice. Adapt classic fairy-tale openings freshly
+    ('Long ago in a kingdom not unlike our own...'). Short declarative sentences
+    for action; longer flowing ones for wonder. End with emotional warmth.
+
+JP:
+  name: "Japanese (日本)"
+  reference_tales:
+    - "Momotaro (Peach Boy)"
+    - "Tanabata"
+  story_arc:
+    "間 (Ma – Stillness)": >-
+      Open with a quiet, sensory scene. A child notices something others
+      overlook — a tiny creature, a glowing stone, a gap in an old shrine gate.
+    "縁 (En – Connection)": >-
+      An unlikely bond forms slowly and carefully. The creature has a need;
+      the child chooses to help despite personal risk.
+    "頑張り (Gambari – Perseverance)": >-
+      The child faces inner doubt and one external obstacle. They persist
+      through gentle determination rather than power.
+    "物の哀れ (Mono no Aware – Bittersweet Resolution)": >-
+      The goal is achieved, but something is gently released — the creature
+      must leave, seasons change. The child holds both joy and quiet sadness.
+  typical_elements:
+    settings:
+      - shrine steps at dusk
+      - cherry blossom lane
+      - quiet fishing village
+      - bamboo forest in rain
+      - paper lanterns on a river
+    character_types:
+      - tanuki (raccoon dog)
+      - kitsune (fox)
+      - tengu (mountain spirit)
+      - kodama (tree spirit)
+      - gentle sea turtle
+    moral_themes:
+      - respect for nature
+      - perseverance
+      - transience of beauty
+      - gratitude
+      - bonds across difference
+  language_style: >-
+    Sparse, contemplative prose. Short sentences with white space in meaning.
+    Rich sensory detail — the sound of rain, the smell of cedar, cool stone underfoot.
+    Avoid over-explanation. One or two Japanese words may appear with gentle context.
+    Tone: quiet, wonder-filled, and slightly melancholic.
+
+AR:
+  name: "Arabian (阿拉伯)"
+  reference_tales:
+    - "One Thousand and One Nights"
+    - "Ali Baba"
+  story_arc:
+    "Frame / Blessing": >-
+      Open with warmth and wonder ('In a city of starlight and spices...').
+      Introduce a clever, warm-hearted child from a humble but loving household.
+    "The Quest or Riddle": >-
+      A djinn, wise merchant, or elder poses a riddle or task.
+      The child must show wisdom, generosity, or honesty — not just cleverness.
+    "Temptation": >-
+      An easy but dishonest shortcut is offered. The child refuses.
+      This refusal is the story's moral pivot.
+    "Barakah (Blessing)": >-
+      Because of their virtue, the child receives unexpected abundance.
+      They share it generously. The story ends with communal warmth.
+  typical_elements:
+    settings:
+      - desert oasis under stars
+      - bustling souk
+      - tiled courtyard with fountain
+      - hidden cave behind a waterfall
+      - starlit rooftop
+    character_types:
+      - friendly djinn
+      - wise merchant
+      - mischievous jinn child
+      - generous baker
+      - old storyteller grandmother
+    moral_themes:
+      - generosity over greed
+      - honesty rewarded
+      - cleverness with heart
+      - community and sharing
+      - trust in goodness
+  language_style: >-
+    Lush, vivid, sensory-rich prose — 'the air smelled of cardamom and night-blooming jasmine'.
+    Use the rhythm of oral storytelling: repetition for emphasis, lists of three.
+    Every character has warmth and humanity. Light formal register,
+    as if an elder narrates by firelight.
+
+AF:
+  name: "African (非洲)"
+  reference_tales:
+    - "Anansi the Spider (West African)"
+    - "The Hare and the Lion (Swahili)"
+  story_arc:
+    "Community": >-
+      Open in a vibrant village or savanna scene. The child is part of a
+      community — their problem or gift is woven into the group's life.
+    "Trickster Encounter": >-
+      A clever animal — Anansi the spider, a hare, a chameleon — appears.
+      It either needs help or offers a lesson disguised as mischief.
+    "Ubuntu Test": >-
+      The child faces a choice: act alone for personal gain, or act together
+      for shared meaning. Ubuntu — 'I am because we are' — is the deciding force.
+    "Celebration": >-
+      Resolution is communal. The village celebrates, animals join in,
+      and a proverb closes the story with collective joy.
+  typical_elements:
+    settings:
+      - acacia tree at sunset
+      - river crossing at dawn
+      - village fire circle
+      - savanna under stars
+      - baobab tree hollow
+    character_types:
+      - Anansi the spider
+      - wise tortoise
+      - boastful lion
+      - clever hare
+      - village elder grandmother
+    moral_themes:
+      - ubuntu (I am because we are)
+      - trickster wisdom
+      - sharing over hoarding
+      - elders' wisdom
+      - joy in community
+  language_style: >-
+    Rhythmic, musical prose — short punchy sentences alternate with longer flowing ones.
+    Use call-and-response echoes. Vivid animal sounds and movement.
+    Warmth, humor, and energy throughout. End with a proverb-style phrase.
+    Tone: joyful, communal, and alive.
