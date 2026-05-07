@@ -48,3 +48,34 @@ No more than 2-3 hours
 Sure
 - How long should the story be?
 You decide
+
+---
+
+## Setup & Running
+
+**Install dependencies** (requires Python 3.8+):
+```bash
+pip install -r requirements.txt
+```
+
+**Set your OpenAI API key** (do not hardcode it):
+```bash
+# Mac / Linux
+export OPENAI_API_KEY='your-key-here'
+
+# Windows PowerShell
+$env:OPENAI_API_KEY='your-key-here'
+```
+
+**Run:**
+```bash
+python main.py
+```
+
+The program will guide you interactively through:
+1. Choosing a cultural setting (Chinese / Western / Japanese / Arabian / African)
+2. Selecting the child's age range and current energy level
+3. Naming your protagonist and picking a theme
+4. Reviewing and approving a story outline before the full story is generated
+
+The system diagram is in `system_diagram.md`.
